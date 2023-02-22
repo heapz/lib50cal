@@ -41,7 +41,7 @@ func (p *LoggerConfig) SetDebugLog(lg logger.Logger) {
 
 // SetPrintLog sets new logger as print for server package, if nil passed then logger pass
 // all logs to /dev/null (io.Discard)
-func (p *LoggerConfig) SetPrintLog(lg *log.Logger) {
+func (p *LoggerConfig) SetPrintLog(lg logger.Logger) {
 	p.print = lg
 	logger.RegisterPrint(lg)
 }
