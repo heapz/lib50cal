@@ -1,9 +1,11 @@
 package server
 
+import "lib50cal/server/config"
+
 type serverConfig struct {
-	cookieConfig    *cookieConfig
-	ratelimitConfig *rateLimitConfig
-	loggerConfig    *loggerConfig
+	cookieConfig    *config.CookieConfig
+	ratelimitConfig *config.RateLimitConfig
+	loggerConfig    *config.LoggerConfig
 
 	// http server config
 	// tls server config
@@ -16,31 +18,30 @@ func NewServerConfig() *serverConfig {
 
 	// default configuration for all modules
 	return &serverConfig{
-		cookieConfig:    NewCookieConfig(),
-		ratelimitConfig: NewrateLimitConfig(),
-		loggerConfig:    NewLoggerConfig(),
+		cookieConfig:    config.NewCookieConfig(),
+		ratelimitConfig: config.NewRateLimitConfig(),
+		loggerConfig:    config.NewLoggerConfig(),
 	}
 }
 
-func (p *serverConfig) SetCookieConfig(val *cookieConfig) {
-	if val == nil {
-		return
-	}
+func (p *serverConfig) SetCookieConfig(val *config.CookieConfig) {
+	// config validation -- > somthing like val.Validate() method
+	// to check whether config is valid or not
 	p.cookieConfig = val
 }
 
-func (p *serverConfig) GetCookieConfig() *cookieConfig {
+func (p *serverConfig) GetCookieConfig() *config.CookieConfig {
 	return p.cookieConfig
 }
 
-func (p *serverConfig) SetRateLimitConfig(val *rateLimitConfig) {
-	if val == nil {
-		return
-	}
+func (p *serverConfig) SetRateLimitConfig(val *config.RateLimitConfig) {
+	// config validation -- > somthing like val.Validate() method
+	// to check whether config is valid or not
+
 	p.ratelimitConfig = val
 }
 
-func (p *serverConfig) GetRateLimitConfig() *rateLimitConfig {
+func (p *serverConfig) GetRateLimitConfig() *config.RateLimitConfig {
 	return p.ratelimitConfig
 }
 
