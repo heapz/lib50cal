@@ -69,6 +69,8 @@ func (p *rateLimiter) inspectIP(ip string) *singleRequest {
 	if !exists {
 		rq := new(singleRequest)
 		rq.limiter = rate.NewLimiter(p.limit, p.burst)
+		rq.ticker = time.NewTicker(p.bantime)
+		go p.vacuum(rq.ticker, ip) // age-out
 		return rq
 	}
 
@@ -106,17 +108,16 @@ func (p *rateLimiter) HttpRateLimit(next http.HandlerFunc) http.HandlerFunc {
 
 		// if we already caught this bad boy
 		if rateLimit.banned {
-			rateLimit.ticker.Reset(p.bantime) // first thing first, extent sentence
 			logger.Debugf("too many request from %s reset bantime period", ipReal)
 			misc.HttpErr(w, http.StatusTooManyRequests) // bad news for clinet
 			return
 		}
 
+		rateLimit.ticker.Reset(p.bantime) // reset age-out timer
+
 		// slowdown cowboy, we have limited resources
 		if !rateLimit.limiter.Allow() {
-			rateLimit.banned = true                      // we have a suspect
-			rateLimit.ticker = time.NewTicker(p.bantime) // start counter to free up space and client
-			go p.vacuum(rateLimit.ticker, ipReal)        // vacuum clients from jail map
+			rateLimit.banned = true
 			logger.Debugf("too many request from %s detected", ipReal)
 			misc.HttpErr(w, http.StatusTooManyRequests)
 			return
